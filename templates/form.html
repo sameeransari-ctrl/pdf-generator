@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Safety Valve Report Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h1>📄 Safety Valve Report</h1>
+        <p>Fill the details and generate your report instantly</p>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <!-- 🔹 CLIENT INFO -->
+            <h3>Client Information</h3>
+            <div class="form-grid">
+
+                <div class="input-group">
+                    <label>Company Name</label>
+                    <input type="text" name="company" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Address</label>
+                    <input type="text" name="address" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Site Contact</label>
+                    <input type="text" name="site_contact" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Reference</label>
+                    <input type="text" name="reference" required>
+                </div>
+
+            </div>
+
+            <!-- 🔹 JOB INFO -->
+            <h3>Job Information</h3>
+            <div class="form-grid">
+
+                <div class="input-group">
+                    <label>Job Number</label>
+                    <input type="text" name="job_number" required>
+                </div>
+
+                <div class="input-group">
+                    <label>PO / Ref No</label>
+                    <input type="text" name="reference_number" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Report Date</label>
+                    <input type="date" name="report_date" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Test Date</label>
+                    <input type="date" name="test_date" required>
+                </div>
+
+            </div>
+
+            <!-- 🔹 VALVE DETAILS -->
+            <h3>Valve Details</h3>
+            <div class="form-grid">
+
+                <div class="input-group">
+                    <label>Manufacturer</label>
+                    <input type="text" name="manufacture" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Model</label>
+                    <input type="text" name="modelsv" required>
+                </div>
+
+                <!-- SIZE FIX -->
+                <div class="input-group">
+                    <label>Valve Size</label>
+
+                    <select name="size" id="sizeDropdown" required onchange="handleSizeChange()">
+                        <option value="">Select Size</option>
+                        <option>1/4"</option>
+                        <option>3/8"</option>
+                        <option>1/2"</option>
+                        <option>3/4"</option>
+                        <option>1 inch</option>
+                        <option value="other">Other</option>
+                    </select>
+
+                    <input type="text" id="newSize"
+                        placeholder="Enter custom size"
+                        style="display:none; margin-top:8px;"
+                        onkeypress="handleEnter(event)">
+                </div>
+
+                <div class="input-group">
+                    <label>Valve Serial No</label>
+                    <input type="text" name="vsn" required>
+                </div>
+
+            </div>
+
+            <!-- 🔹 TEST DATA -->
+            <h3>Test Data</h3>
+            <div class="form-grid">
+
+                <div class="input-group">
+                    <label>Test Number</label>
+                    <input type="text" name="test_number" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Set Pressure (kPa)</label>
+                    <input type="text" name="kpa" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Lift Pressure</label>
+                    <input type="text" name="aflp" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Reseat Pressure</label>
+                    <input type="text" name="afrp" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Flow Rate</label>
+                    <input type="text" name="flow_r" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Blowdown %</label>
+                    <input type="text" name="blowdown" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Date</label>
+                    <input type="date" name="date" required>
+                </div>
+
+            </div>
+
+            <!-- 🔹 ATTACHMENTS -->
+            <h3>Attachments</h3>
+
+            <div class="input-group full-width">
+                <label>Add Images</label>
+                <button type="button" onclick="openModal()">📷 Add Images</button>
+                <input type="file" id="fileInput" name="images" multiple accept="image/*" style="display:none;">
+            </div>
+
+            <!-- Camera -->
+            <div id="cameraBox" style="display:none; margin-top:10px;">
+                <video id="video" autoplay style="width:100%; border-radius:10px;"></video>
+                <button type="button" onclick="takePhoto()">Capture</button>
+                <canvas id="canvas" style="display:none;"></canvas>
+            </div>
+
+            <!-- Preview -->
+            <div class="input-group full-width">
+                <label>Preview</label>
+                <div id="preview"></div>
+            </div>
+
+            <button type="submit">Generate Report</button>
+
+        </form>
+    </div>
+</div>
+
+<!-- 🔥 MODAL -->
+<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:20px; border-radius:10px; text-align:center;">
+        <h3>Select Option</h3>
+        <button onclick="chooseGallery()">📁 Gallery</button>
+        <button onclick="chooseCamera()">📷 Camera</button>
+        <br><br>
+        <button onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+
+<script>
+
+// SIZE
+function handleSizeChange() {
+    newSize.style.display = sizeDropdown.value === "other" ? "block" : "none";
+}
+
+function handleEnter(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        addSize();
+    }
+}
+
+function addSize() {
+    let value = newSize.value.trim();
+    if (!value) return;
+
+    if (!value.endsWith('"')) value += '"';
+
+    let option = new Option(value, value);
+    sizeDropdown.add(option);
+    sizeDropdown.value = value;
+
+    newSize.value = "";
+    newSize.style.display = "none";
+}
+
+// MODAL
+// function openModal() { modal.style.display = "flex"; }
+
+function openModal() {
+    stopCamera(); // 🔥 ensures clean state
+    modal.style.display = "flex";
+}
+function closeModal() { modal.style.display = "none"; }
+
+// IMAGE
+let capturedFiles = [];
+
+// Gallery
+// function chooseGallery() {
+//     fileInput.removeAttribute("capture");
+//     fileInput.click();
+//     closeModal();
+// }
+
+function chooseGallery() {
+    stopCamera(); // 🔥 ADD THIS
+
+    fileInput.removeAttribute("capture");
+    fileInput.click();
+    closeModal();
+}
+
+// Camera
+// function chooseCamera() {
+//     closeModal();
+
+//     if (/Android|iPhone/i.test(navigator.userAgent)) {
+//         fileInput.setAttribute("capture", "environment");
+//         fileInput.click();
+//     } else {
+//         startCamera();
+//     }
+// }
+
+
+function chooseCamera() {
+    closeModal();
+
+    stopCamera(); // 🔥 RESET before starting
+
+    if (/Android|iPhone/i.test(navigator.userAgent)) {
+        fileInput.setAttribute("capture", "environment");
+        fileInput.click();
+    } else {
+        startCamera();
+    }
+}
+
+// Desktop camera
+async function startCamera() {
+    cameraBox.style.display = "block";
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+}
+
+// Capture
+function takePhoto() {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    canvas.getContext("2d").drawImage(video, 0, 0);
+
+    canvas.toBlob(blob => {
+        let file = new File([blob], `img_${Date.now()}.png`);
+        capturedFiles.push(file);
+
+        let img = document.createElement("img");
+        img.src = URL.createObjectURL(blob);
+        img.style.width = "100px";
+        img.style.margin = "5px";
+        preview.appendChild(img);
+    });
+}
+
+// Preview upload
+fileInput.addEventListener("change", e => {
+    for (let file of e.target.files) {
+        let img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.style.width = "100px";
+        img.style.margin = "5px";
+        preview.appendChild(img);
+    }
+});
+
+// Merge
+document.querySelector("form").addEventListener("submit", function() {
+    let dt = new DataTransfer();
+
+    for (let f of fileInput.files) dt.items.add(f);
+    for (let f of capturedFiles) dt.items.add(f);
+
+    fileInput.files = dt.files;
+});
+
+
+function stopCamera() {
+    if (video.srcObject) {
+        let tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+    }
+    cameraBox.style.display = "none";
+}
+
+</script>
+
+</body>
+</html>

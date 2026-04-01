@@ -1,26 +1,63 @@
-# Virtual environments
-env/
-venv/
-.venv/
-
-# Byte-compiled / cache files
+# 🐍 Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
+*.pyc
 
-# Distribution / packaging
+# 🧪 Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+venv.bak/
+env.bak/
+
+# 📦 Distribution / Packaging
 build/
 dist/
 *.egg-info/
+.eggs/
 
-# Logs
+# 🧾 Logs
 *.log
 
-# OS files
+# 🔐 Environment variables
+.env
+.env.*
+!.env.example
+
+# 🗃️ Database
+*.sqlite3
+*.db
+
+# 🖥️ OS Files
 .DS_Store
 Thumbs.db
 
-# IDE files
+# 🧪 Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 🧰 IDEs
 .vscode/
 .idea/
+
+# 📁 Flask specific
+instance/
+*.flaskenv
+
+# 📂 Output / uploads (IMPORTANT for your project)
+output/
+uploads/
+static/uploads/
+
+# 🧠 Jupyter (if used)
+.ipynb_checkpoints/
+
+# 🧪 mypy / type check
+.mypy_cache/
+
+# ⚙️ Other caches
+.cache/
